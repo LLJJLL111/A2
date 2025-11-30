@@ -1,93 +1,69 @@
 /**
- * Abstract class representing a general Person
- * This class serves as the base class for Employee and Visitor
- * It contains common attributes that all person types share
- * Made abstract as Person objects should not be instantiated directly
+ * Abstract Person class - Base class for all person types in the theme park system
+ * Contains common attributes and behaviors for all persons
  */
 public abstract class Person {
-    // Instance variables for person attributes
-    private String name;        // Name of the person
-    private int age;           // Age of the person
-    private String email;      // Email address of the person
+    // Instance variables common to all persons
+    private String name;
+    private int age;
+    private String id;
 
     /**
-     * Default constructor
-     * Initializes person with default values
+     * Default constructor - initializes with default values
      */
     public Person() {
         this.name = "Unknown";
         this.age = 0;
-        this.email = "unknown@example.com";
+        this.id = "0000";
     }
 
     /**
-     * Parameterized constructor
-     * @param name The name of the person
-     * @param age The age of the person
-     * @param email The email address of the person
+     * Parameterized constructor - initializes with provided values
+     * @param name The person's name
+     * @param age The person's age
+     * @param id The person's identification
      */
-    public Person(String name, int age, String email) {
+    public Person(String name, int age, String id) {
         this.name = name;
         this.age = age;
-        this.email = email;
+        this.id = id;
     }
 
     // Getter and setter methods
-
-    /**
-     * Gets the name of the person
-     * @return The person's name
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * Sets the name of the person
-     * @param name The new name to set
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * Gets the age of the person
-     * @return The person's age
-     */
     public int getAge() {
         return age;
     }
 
-    /**
-     * Sets the age of the person
-     * @param age The new age to set
-     */
     public void setAge(int age) {
-        this.age = age;
+        if (age >= 0) {
+            this.age = age;
+        } else {
+            System.out.println("Error: Age cannot be negative");
+        }
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
-     * Gets the email of the person
-     * @return The person's email address
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * Sets the email of the person
-     * @param email The new email address to set
-     */
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    /**
-     * Returns a string representation of the person
+     * Returns string representation of the person
      * @return String containing person details
      */
     @Override
     public String toString() {
-        return "Person{name='" + name + "', age=" + age + ", email='" + email + "'}";
+        return "Person{name='" + name + "', age=" + age + ", id='" + id + "'}";
     }
 }
