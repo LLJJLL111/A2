@@ -2,6 +2,7 @@
  * Abstract class representing a general Person
  * This class serves as the base class for Employee and Visitor
  * It contains common attributes that all person types share
+ * Made abstract as Person objects should not be instantiated directly
  */
 public abstract class Person {
     // Instance variables for person attributes
