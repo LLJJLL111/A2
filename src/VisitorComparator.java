@@ -1,8 +1,8 @@
 import java.util.Comparator;
 
 /**
- * VisitorComparator - Implements Comparator interface for sorting visitors
- * Required for Part 4B functionality
+ * VisitorComparator - Implements Comparator for sorting visitors
+ * Part 4B: Uses at least two instance variables in comparison
  */
 public class VisitorComparator implements Comparator<Visitor> {
     private String sortType;
@@ -26,18 +26,16 @@ public class VisitorComparator implements Comparator<Visitor> {
 
             case "membership_age":
             default:
+                // First: Membership level (Premium first)
                 int membershipCompare = getMembershipPriority(v2.getMembershipLevel()) -
                         getMembershipPriority(v1.getMembershipLevel());
+                if (membershipCompare != 0) return membershipCompare;
 
-                if (membershipCompare != 0) {
-                    return membershipCompare;
-                }
-
+                // Second: Age (younger first)
                 int ageCompare = Integer.compare(v1.getAge(), v2.getAge());
-                if (ageCompare != 0) {
-                    return ageCompare;
-                }
+                if (ageCompare != 0) return ageCompare;
 
+                // Third: Name (alphabetical)
                 return v1.getName().compareToIgnoreCase(v2.getName());
         }
     }
@@ -48,22 +46,10 @@ public class VisitorComparator implements Comparator<Visitor> {
         switch (membershipLevel.toLowerCase()) {
             case "premium":
             case "gold":
-            case "vip":
-                return 3;
-            case "standard":
-                return 2;
-            case "basic":
-                return 1;
-            default:
-                return 0;
+            case "vip": return 3;
+            case "standard": return 2;
+            case "basic": return 1;
+            default: return 0;
         }
-    }
-
-    public String getSortType() {
-        return sortType;
-    }
-
-    public void setSortType(String sortType) {
-        this.sortType = sortType;
     }
 }

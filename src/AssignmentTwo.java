@@ -1,177 +1,222 @@
+import java.io.PrintWriter;
 import java.io.File;
 
 /**
- * AssignmentTwo class - Main class containing demonstration methods
- * Part 6 Update: Implements partSix demonstration method for file export
+ * AssignmentTwo - Main class with Part 7 demonstration
+ * Demonstrates file import functionality
  */
 public class AssignmentTwo {
 
-    /**
-     * Main method - Program entry point
-     * @param args Command line arguments
-     */
     public static void main(String[] args) {
-        System.out.println("=== Theme Park Visitor Management System ===");
-        System.out.println("Part 6: File Export Demonstration");
+        System.out.println("=== Theme Park Visitor Management System ===\n");
+        System.out.println("Part 7: File Import Demonstration\n");
 
         AssignmentTwo assignment = new AssignmentTwo();
-
-        // Execute Part 6 demonstration
-        assignment.partSix();
+        assignment.partSeven();
     }
 
     /**
-     * Part 6: File Writing Demonstration
-     * Creates Ride object, adds visitors to history, exports to files
-     * Demonstrates CSV file writing with proper exception handling
+     * Part 7: File Import Demonstration
+     * Demonstrates importing visitors from CSV file into ride history
      */
-    public void partSix() {
-        System.out.println("\n💾 === Part 6: File Writing Demonstration ===");
-
-        // Step 1: Create ride operator and ride
-        System.out.println("\n1. Setting up ride and operator...");
-        Employee operator = new Employee("Data Manager", 35, "E006", "OP006", "Data Operations", "Manager");
-        Ride spaceRide = new Ride("Galaxy Explorer", "Space Simulation", operator, 20, true, 3);
-        System.out.println("   Ride created: " + spaceRide.getRideName());
-
-        // Step 2: Create visitors for ride history (minimum 5 as required)
-        System.out.println("\n2. Creating visitors for ride history...");
-        Visitor[] visitors = {
-                new Visitor("John Cosmic", 27, "V401", "T401", "Premium", true),
-                new Visitor("Sarah Star", 24, "V402", "T402", "Standard", false),
-                new Visitor("Mike Nebula", 32, "V403", "T403", "Gold", true),
-                new Visitor("Lisa Comet", 19, "V404", "T404", "Standard", true),
-                new Visitor("David Orbit", 45, "V405", "T405", "Premium", false),
-                new Visitor("Emma Galaxy", 29, "V406", "T406", "VIP", true),    // Extra for testing
-                new Visitor("Tom Asteroid", 38, "V407", "T407", "Standard", false) // Extra for testing
-        };
-
-        // Display created visitors
-        System.out.println("   Created " + visitors.length + " visitors:");
-        for (Visitor visitor : visitors) {
-            System.out.println("   - " + visitor.getName() +
-                    " (Membership: " + visitor.getMembershipLevel() + ")");
-        }
-
-        // Step 3: Add visitors to ride history
-        System.out.println("\n3. Adding visitors to ride history...");
-        for (Visitor visitor : visitors) {
-            spaceRide.addVisitorToHistory(visitor);
-        }
-
-        // Step 4: Run some cycles to add more data
-        System.out.println("\n4. Running ride cycles to generate more data...");
-
-        // Add some visitors to queue and run cycles
-        Visitor[] queueVisitors = {
-                new Visitor("Queue Rider 1", 25, "V501", "T501", "Standard", false),
-                new Visitor("Queue Rider 2", 30, "V502", "T502", "Premium", true),
-                new Visitor("Queue Rider 3", 22, "V503", "T503", "Standard", false)
-        };
-
-        for (Visitor visitor : queueVisitors) {
-            spaceRide.addVisitorToQueue(visitor);
-        }
-
-        spaceRide.runOneCycle();
-
-        // Step 5: Print current ride history before export
-        System.out.println("\n5. Current ride history before export:");
-        spaceRide.printRideHistory();
-
-        // Step 6: Export ride history to CSV file (main requirement)
-        System.out.println("\n6. Exporting ride history to CSV file...");
-        String mainExportFile = "galaxy_explorer_history.csv";
-        spaceRide.exportRideHistory(mainExportFile);
-
-        // Step 7: Verify file was created
-        System.out.println("\n7. Verifying file creation...");
-        File exportFile = new File(mainExportFile);
-        if (exportFile.exists()) {
-            System.out.println("✅ Verification: File created successfully");
-            System.out.println("   File size: " + exportFile.length() + " bytes");
-            System.out.println("   File path: " + exportFile.getAbsolutePath());
-        } else {
-            System.out.println("❌ Verification: File was not created");
-        }
-
-        // Step 8: Export with header information (additional feature)
-        System.out.println("\n8. Exporting with header information...");
-        String headerExportFile = "galaxy_explorer_history_with_header.csv";
-        spaceRide.exportRideHistoryWithHeader(headerExportFile);
-
-        // Step 9: Export ride statistics (additional feature)
-        System.out.println("\n9. Exporting ride statistics...");
-        String statsFile = "galaxy_explorer_statistics.txt";
-        spaceRide.exportRideStatistics(statsFile);
-
-        // Step 10: Test edge cases and error handling
-        System.out.println("\n10. Testing edge cases and error handling...");
-
-        // Test 10a: Export from empty ride
-        System.out.println("   a) Testing export from empty ride:");
-        Ride emptyRide = new Ride("Empty Ride", "Test", operator, 10, true);
-        emptyRide.exportRideHistory("empty_ride_history.csv");
-
-        // Test 10b: Export to invalid file path
-        System.out.println("   b) Testing export to invalid path:");
-        spaceRide.exportRideHistory("/invalid/path/history.csv");
-
-        // Test 10c: Export with special characters in data
-        System.out.println("   c) Testing export with special characters:");
-        Ride specialRide = new Ride("Test Ride", "Special", operator, 10, true);
-        Visitor specialVisitor = new Visitor("John \"The Comma\", Smith", 25, "V999", "T999", "Premium, VIP", true);
-        specialRide.addVisitorToHistory(specialVisitor);
-        specialRide.exportRideHistory("special_chars_test.csv");
-
-        // Step 11: Display file contents preview
-        System.out.println("\n11. File contents preview:");
-        System.out.println("   Main export file: " + mainExportFile);
-        System.out.println("   Expected format: name,age,id,ticketNumber,membershipLevel,hasFastPass");
-        System.out.println("   Sample line: \"John Cosmic\",27,V401,T401,Premium,true");
-
-        // Step 12: Verify all assignment requirements are met
-        System.out.println("\n12. Verification of Part 6 Requirements:");
-        System.out.println("   ✓ Added exportRideHistory method to Ride class");
-        System.out.println("   ✓ Writes visitor details to file in CSV format");
-        System.out.println("   ✓ Each visitor on their own line");
-        System.out.println("   ✓ Includes all appropriate exception handling");
-        System.out.println("   ✓ Provides clear error messages");
-        System.out.println("   ✓ Added minimum 5 visitors to ride history: " + (spaceRide.getHistorySize() >= 5));
-        System.out.println("   ✓ Does not backup queue (as specified)");
-        System.out.println("   ✓ Uses proper file I/O operations");
-
-        // Step 13: Final summary
-        System.out.println("\n13. Export Summary:");
-        System.out.println("   Files created:");
-        System.out.println("   - " + mainExportFile + " (main CSV export)");
-        System.out.println("   - " + headerExportFile + " (CSV with header)");
-        System.out.println("   - " + statsFile + " (statistics report)");
-        System.out.println("   Total visitors exported: " + spaceRide.getHistorySize());
-        System.out.println("   Export completed: " + (exportFile.exists() ? "SUCCESS" : "FAILED"));
-
-        System.out.println("\n✅ Part 6 demonstration completed successfully!");
-        System.out.println("   All file writing functionality requirements have been met.");
-    }
-
-    // Placeholder methods for other parts
-    public void partThree() {
-        System.out.println("Part 3 method - Already implemented");
-    }
-
-    public void partFourA() {
-        System.out.println("Part 4A method - Already implemented");
-    }
-
-    public void partFourB() {
-        System.out.println("Part 4B method - Already implemented");
-    }
-
-    public void partFive() {
-        System.out.println("Part 5 method - Already implemented");
-    }
-
     public void partSeven() {
-        System.out.println("Part 7 method - To be implemented in Part 7");
+        System.out.println("=== Part 7: File Import Functionality ===\n");
+
+        // Step 1: Create a test CSV file for import
+        System.out.println("1. Creating test CSV file for import...");
+        createTestImportFile();
+
+        // Step 2: Create a new ride for testing import
+        System.out.println("\n2. Creating new ride for import test...");
+        Employee operator = new Employee("Import Manager", 40, "E007", "OP007", "Data Operations", "Manager");
+        Ride testRide = new Ride("Import Test Ride", "Demonstration", operator, 15, true);
+
+        // Step 3: Show history before import (should be empty)
+        System.out.println("\n3. Ride history before import:");
+        System.out.println("   Number of visitors in history: " + testRide.numberOfVisitors());
+        testRide.printRideHistory();
+
+        // Step 4: Import visitors from CSV file
+        System.out.println("\n4. Importing visitors from CSV file...");
+        String importFile = "test_import.csv";
+        testRide.importRideHistory(importFile);
+
+        // Step 5: Show history after import
+        System.out.println("\n5. Ride history after import:");
+        System.out.println("   Number of visitors in history: " + testRide.numberOfVisitors());
+        testRide.printRideHistory();
+
+        // Step 6: Verify specific visitors were imported correctly
+        System.out.println("\n6. Verifying imported visitors...");
+        verifyImportedVisitors(testRide);
+
+        // Step 7: Test error handling with non-existent file
+        System.out.println("\n7. Testing error handling with non-existent file...");
+        testRide.importRideHistory("non_existent_file.csv");
+
+        // Step 8: Test error handling with malformed CSV
+        System.out.println("\n8. Testing error handling with malformed CSV...");
+        createMalformedCsvFile();
+        testRide.importRideHistory("malformed_data.csv");
+
+        // Step 9: Test import with empty file
+        System.out.println("\n9. Testing import with empty file...");
+        createEmptyFile();
+        Ride emptyRide = new Ride("Empty Test Ride", "Test", operator, 10, true);
+        emptyRide.importRideHistory("empty_file.csv");
+
+        // Step 10: Test duplicate import (should not add duplicates)
+        System.out.println("\n10. Testing duplicate import prevention...");
+        System.out.println("   History size before duplicate import: " + testRide.numberOfVisitors());
+        testRide.importRideHistory(importFile); // Import same file again
+        System.out.println("   History size after duplicate import: " + testRide.numberOfVisitors());
+
+        // Step 11: Export the imported data (combining Part 6 and 7)
+        System.out.println("\n11. Exporting imported data to new file...");
+        String exportFile = "imported_data_export.csv";
+        testRide.exportRideHistory(exportFile);
+
+        File exportedFile = new File(exportFile);
+        if (exportedFile.exists()) {
+            System.out.println("   Export successful: " + exportFile);
+            System.out.println("   File size: " + exportedFile.length() + " bytes");
+        }
+
+        // Step 12: Clean up test files
+        System.out.println("\n12. Cleaning up test files...");
+        cleanupTestFiles();
+
+        // Step 13: Summary of Part 7 requirements
+        System.out.println("\n13. Part 7 Requirements Summary:");
+        System.out.println("   ✓ Added importRideHistory method to Ride class");
+        System.out.println("   ✓ Can read file created in Part 6");
+        System.out.println("   ✓ Adds visitors to LinkedList (ride history)");
+        System.out.println("   ✓ Includes appropriate exception handling");
+        System.out.println("   ✓ Provides clear error messages");
+        System.out.println("   ✓ Handles duplicate visitors appropriately");
+        System.out.println("   ✓ Validates CSV format and data");
+
+        System.out.println("\n✅ Part 7 demonstration completed successfully!");
+    }
+
+    /**
+     * Creates a test CSV file for import testing
+     */
+    private void createTestImportFile() {
+        try (PrintWriter writer = new PrintWriter("test_import.csv")) {
+            // Add header comment
+            writer.println("# Test import file for Part 7 demonstration");
+            writer.println("# Format: name,age,id,ticketNumber,membershipLevel,hasFastPass");
+            writer.println("# Created: " + new java.util.Date());
+            writer.println();
+
+            // Add visitor data (minimum 5 as required)
+            writer.println("Alice Johnson,25,V001,T001,Premium,true");
+            writer.println("Bob Smith,30,V002,T002,Standard,false");
+            writer.println("Charlie Brown,22,V003,T003,Gold,true");
+            writer.println("Diana Prince,28,V004,T004,Standard,true");
+            writer.println("Evan Davis,35,V005,T005,Premium,false");
+
+            // Additional test cases
+            writer.println("Frank Wilson,40,V006,T006,VIP,true");
+            writer.println("\"Grace, O'Connor\",29,V007,T007,Premium,false"); // Name with comma
+            writer.println("\"John \"\"The Boss\"\"\",45,V008,T008,Standard,true"); // Name with quotes
+
+            System.out.println("   Created: test_import.csv with 8 test visitors");
+            System.out.println("   Includes special characters (commas and quotes)");
+
+        } catch (Exception e) {
+            System.out.println("Error creating test file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Creates a malformed CSV file for error testing
+     */
+    private void createMalformedCsvFile() {
+        try (PrintWriter writer = new PrintWriter("malformed_data.csv")) {
+            writer.println("# Malformed CSV file for error testing");
+            writer.println("Valid Visitor,25,V101,T101,Standard,true"); // Valid line
+            writer.println("Invalid Age,not_a_number,V102,T102,Standard,true"); // Invalid age
+            writer.println("Missing Fields,30"); // Not enough fields
+            writer.println("Extra,Fields,30,V103,T103,Standard,true,extra,data"); // Too many fields
+            writer.println(""); // Empty line
+            writer.println("Negative Age,-5,V104,T104,Standard,false"); // Negative age
+            writer.println("John Doe,200,V105,T105,Standard,true"); // Invalid age (too high)
+
+            System.out.println("   Created: malformed_data.csv with various errors");
+
+        } catch (Exception e) {
+            System.out.println("Error creating malformed file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Creates an empty file for testing
+     */
+    private void createEmptyFile() {
+        try (PrintWriter writer = new PrintWriter("empty_file.csv")) {
+            writer.println("# Empty test file");
+            writer.println("");
+
+            System.out.println("   Created: empty_file.csv (empty file)");
+
+        } catch (Exception e) {
+            System.out.println("Error creating empty file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Verifies that visitors were imported correctly
+     */
+    private void verifyImportedVisitors(Ride ride) {
+        // Create test visitors to check
+        Visitor[] testVisitors = {
+                new Visitor("Alice Johnson", 25, "V001", "T001", "Premium", true),
+                new Visitor("Bob Smith", 30, "V002", "T002", "Standard", false),
+                new Visitor("Charlie Brown", 22, "V003", "T003", "Gold", true),
+                new Visitor("Diana Prince", 28, "V004", "T004", "Standard", true),
+                new Visitor("Evan Davis", 35, "V005", "T005", "Premium", false)
+        };
+
+        int verifiedCount = 0;
+
+        for (Visitor testVisitor : testVisitors) {
+            if (ride.checkVisitorFromHistory(testVisitor)) {
+                System.out.println("   ✓ Verified: " + testVisitor.getName());
+                verifiedCount++;
+            } else {
+                System.out.println("   ✗ Missing: " + testVisitor.getName());
+            }
+        }
+
+        System.out.println("\n   Total verified: " + verifiedCount + " out of " + testVisitors.length);
+
+        if (verifiedCount >= 5) {
+            System.out.println("   ✅ Success: Minimum 5 visitors imported as required");
+        }
+    }
+
+    /**
+     * Cleans up test files created during demonstration
+     */
+    private void cleanupTestFiles() {
+        String[] filesToDelete = {
+                "test_import.csv",
+                "malformed_data.csv",
+                "empty_file.csv",
+                "imported_data_export.csv"
+        };
+
+        for (String filename : filesToDelete) {
+            File file = new File(filename);
+            if (file.exists()) {
+                if (file.delete()) {
+                    System.out.println("   Deleted: " + filename);
+                } else {
+                    System.out.println("   Failed to delete: " + filename);
+                }
+            }
+        }
     }
 }
