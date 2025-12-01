@@ -2,8 +2,7 @@ import java.util.*;
 import java.io.*;
 
 /**
- * Ride class - Complete implementation with file import functionality
- * Part 7 Update: Adds importRideHistory method to read visitors from CSV file
+ * Ride class - Complete implementation with all parts
  */
 public class Ride implements RideInterface {
     // Basic attributes
@@ -109,8 +108,7 @@ public class Ride implements RideInterface {
         System.out.println("=== Waiting Queue for " + rideName + " ===");
         int position = 1;
         for (Visitor visitor : waitingQueue) {
-            System.out.println(position + ". " + visitor.getName() +
-                    " (Ticket: " + visitor.getTicketNumber() + ")");
+            System.out.println(position + ". " + visitor.getName());
             position++;
         }
     }
@@ -146,9 +144,7 @@ public class Ride implements RideInterface {
 
         while (iterator.hasNext()) {
             Visitor visitor = iterator.next();
-            System.out.println(position + ". " + visitor.getName() +
-                    " (Age: " + visitor.getAge() +
-                    ", Membership: " + visitor.getMembershipLevel() + ")");
+            System.out.println(position + ". " + visitor.getName());
             position++;
         }
     }
@@ -158,6 +154,10 @@ public class Ride implements RideInterface {
         if (rideHistory.size() > 1) {
             Collections.sort(rideHistory, comparator);
         }
+    }
+
+    public void sortRideHistoryByName() {
+        sortRideHistory(new VisitorComparator("name"));
     }
 
     // Part 5: Ride cycle operations
@@ -214,64 +214,40 @@ public class Ride implements RideInterface {
     public void importRideHistory(String filename) {
         BufferedReader reader = null;
         int importedCount = 0;
-        int skippedCount = 0;
 
         try {
-            // Create FileReader and BufferedReader
             reader = new BufferedReader(new FileReader(filename));
             String line;
 
-            System.out.println("Starting import from file: " + filename);
-
-            // Read file line by line
             while ((line = reader.readLine()) != null) {
-                line = line.trim();
-
                 // Skip empty lines and comment lines
-                if (line.isEmpty() || line.startsWith("#")) {
+                if (line.trim().isEmpty() || line.trim().startsWith("#")) {
                     continue;
                 }
 
                 try {
-                    // Parse visitor from CSV line
                     Visitor visitor = parseVisitorFromCsv(line);
-                    if (visitor != null) {
-                        // Add to ride history if not already present
-                        if (!rideHistory.contains(visitor)) {
-                            rideHistory.add(visitor);
-                            importedCount++;
-                        } else {
-                            skippedCount++;
-                        }
+                    if (visitor != null && !rideHistory.contains(visitor)) {
+                        rideHistory.add(visitor);
+                        importedCount++;
                     }
                 } catch (Exception e) {
                     System.out.println("Warning: Skipping invalid line - " + line);
-                    System.out.println("  Reason: " + e.getMessage());
-                    skippedCount++;
                 }
             }
 
-            // Print import summary
-            System.out.println("Import completed from " + filename);
-            System.out.println("  Successfully imported: " + importedCount + " visitors");
-            System.out.println("  Skipped/duplicate: " + skippedCount + " entries");
-            System.out.println("  Total in history: " + rideHistory.size());
+            System.out.println("Successfully imported " + importedCount + " visitors from " + filename);
 
         } catch (FileNotFoundException e) {
             System.out.println("Error: File not found - " + filename);
-            System.out.println("  Please check the file path and try again.");
         } catch (IOException e) {
             System.out.println("Error reading file: " + e.getMessage());
-            System.out.println("  There was a problem reading the file.");
-        } catch (Exception e) {
-            System.out.println("Unexpected error during import: " + e.getMessage());
         } finally {
-            // Always close the reader
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    System.out.println("Warning: Error closing file reader: " + e.getMessage());
+                    System.out.println("Error closing file: " + e.getMessage());
                 }
             }
         }
@@ -280,60 +256,32 @@ public class Ride implements RideInterface {
     /**
      * Parses a Visitor object from a CSV line
      * Expected format: name,age,id,ticketNumber,membershipLevel,hasFastPass
-     * Example: "John Doe",25,V001,T001,Premium,true
      */
-    private Visitor parseVisitorFromCsv(String csvLine) throws Exception {
-        // Parse CSV line into fields
+    private Visitor parseVisitorFromCsv(String csvLine) {
+        // Handle quoted fields
         List<String> fields = parseCsvLine(csvLine);
 
-        // Validate number of fields
-        if (fields.size() != 6) {
-            throw new Exception("Expected 6 fields but found " + fields.size() + ": " + csvLine);
+        if (fields.size() < 6) {
+            throw new IllegalArgumentException("Invalid CSV format: expected 6 fields");
         }
 
         try {
-            // Extract and validate each field
-            String name = fields.get(0).trim();
-            if (name.isEmpty()) {
-                throw new Exception("Name cannot be empty");
-            }
+            String name = fields.get(0);
+            int age = Integer.parseInt(fields.get(1));
+            String id = fields.get(2);
+            String ticketNumber = fields.get(3);
+            String membershipLevel = fields.get(4);
+            boolean hasFastPass = Boolean.parseBoolean(fields.get(5));
 
-            int age = Integer.parseInt(fields.get(1).trim());
-            if (age < 0 || age > 120) {
-                throw new Exception("Invalid age: " + age);
-            }
-
-            String id = fields.get(2).trim();
-            if (id.isEmpty()) {
-                throw new Exception("ID cannot be empty");
-            }
-
-            String ticketNumber = fields.get(3).trim();
-            if (ticketNumber.isEmpty()) {
-                throw new Exception("Ticket number cannot be empty");
-            }
-
-            String membershipLevel = fields.get(4).trim();
-            if (membershipLevel.isEmpty()) {
-                throw new Exception("Membership level cannot be empty");
-            }
-
-            boolean hasFastPass = Boolean.parseBoolean(fields.get(5).trim());
-
-            // Create and return Visitor object
             return new Visitor(name, age, id, ticketNumber, membershipLevel, hasFastPass);
 
         } catch (NumberFormatException e) {
-            throw new Exception("Invalid number format in age or boolean field");
-        } catch (Exception e) {
-            throw new Exception("Error parsing visitor data: " + e.getMessage());
+            throw new IllegalArgumentException("Invalid number format in CSV line");
         }
     }
 
     /**
-     * Parses a CSV line into fields, handling quoted fields and escaped quotes
-     * @param csvLine The CSV line to parse
-     * @return List of field values
+     * Parses a CSV line, handling quoted fields
      */
     private List<String> parseCsvLine(String csvLine) {
         List<String> fields = new ArrayList<>();
@@ -341,43 +289,36 @@ public class Ride implements RideInterface {
         boolean inQuotes = false;
 
         for (int i = 0; i < csvLine.length(); i++) {
-            char currentChar = csvLine.charAt(i);
+            char c = csvLine.charAt(i);
 
-            if (currentChar == '"') {
-                // Check for escaped quote (two quotes in a row)
+            if (c == '"') {
+                // Handle escaped quotes
                 if (inQuotes && i + 1 < csvLine.length() && csvLine.charAt(i + 1) == '"') {
                     currentField.append('"');
-                    i++; // Skip the next quote
+                    i++; // Skip next quote
                 } else {
-                    // Toggle quote mode
                     inQuotes = !inQuotes;
                 }
-            } else if (currentChar == ',' && !inQuotes) {
-                // End of field
+            } else if (c == ',' && !inQuotes) {
                 fields.add(currentField.toString());
                 currentField = new StringBuilder();
             } else {
-                // Add character to current field
-                currentField.append(currentChar);
+                currentField.append(c);
             }
         }
 
-        // Add the last field
+        // Add last field
         fields.add(currentField.toString());
         return fields;
     }
 
     /**
-     * Escapes special characters for CSV export
+     * Escapes special characters for CSV
      */
     private String escapeCsv(String field) {
-        if (field == null) {
-            return "";
-        }
+        if (field == null) return "";
 
-        // If field contains special characters, wrap in quotes
-        if (field.contains(",") || field.contains("\"") || field.contains("\n") || field.contains("\r")) {
-            // Escape any quotes within the field
+        if (field.contains(",") || field.contains("\"") || field.contains("\n")) {
             return "\"" + field.replace("\"", "\"\"") + "\"";
         }
 
