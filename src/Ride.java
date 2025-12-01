@@ -3,7 +3,7 @@ import java.io.*;
 
 /**
  * Ride class - Represents an amusement park ride
- * Part 4 Update: Implements ride history and sorting functionality
+ * Part 5 Update: Implements ride cycle functionality
  */
 public class Ride implements RideInterface {
     // Basic ride attributes
@@ -19,7 +19,7 @@ public class Ride implements RideInterface {
     // Part 4: LinkedList for ride history
     private LinkedList<Visitor> rideHistory;
 
-    // Part 5: Ride cycle management (to be implemented)
+    // Part 5: Ride cycle management
     private int maxRider;
     private int numOfCycles;
 
@@ -36,7 +36,7 @@ public class Ride implements RideInterface {
         // Initialize collections
         this.waitingQueue = new LinkedList<>();
         this.rideHistory = new LinkedList<>();
-        this.maxRider = 2;
+        this.maxRider = 2; // Default max riders per cycle
         this.numOfCycles = 0;
     }
 
@@ -58,7 +58,30 @@ public class Ride implements RideInterface {
         // Initialize collections
         this.waitingQueue = new LinkedList<>();
         this.rideHistory = new LinkedList<>();
-        this.maxRider = 2;
+        this.maxRider = 2; // Default max riders per cycle
+        this.numOfCycles = 0;
+    }
+
+    /**
+     * Constructor with maxRider parameter for Part 5
+     * @param rideName The name of the ride
+     * @param rideType The type of the ride
+     * @param operator The employee operating the ride
+     * @param capacity The capacity of the ride
+     * @param isOperational Whether the ride is operational
+     * @param maxRider Maximum number of riders per cycle
+     */
+    public Ride(String rideName, String rideType, Employee operator, int capacity, boolean isOperational, int maxRider) {
+        this.rideName = rideName;
+        this.rideType = rideType;
+        this.operator = operator;
+        this.capacity = capacity;
+        this.isOperational = isOperational;
+
+        // Initialize collections
+        this.waitingQueue = new LinkedList<>();
+        this.rideHistory = new LinkedList<>();
+        this.maxRider = maxRider;
         this.numOfCycles = 0;
     }
 
@@ -108,6 +131,28 @@ public class Ride implements RideInterface {
 
     public void setOperational(boolean operational) {
         isOperational = operational;
+    }
+
+    // Part 5: Getter and setter for maxRider and numOfCycles
+    public int getMaxRider() {
+        return maxRider;
+    }
+
+    /**
+     * Sets the maximum number of riders per cycle
+     * @param maxRider Maximum riders (must be at least 1)
+     */
+    public void setMaxRider(int maxRider) {
+        if (maxRider >= 1) {
+            this.maxRider = maxRider;
+            System.out.println("Max riders per cycle set to: " + maxRider + " for " + rideName);
+        } else {
+            System.out.println("❌ Error: maxRider must be at least 1");
+        }
+    }
+
+    public int getNumOfCycles() {
+        return numOfCycles;
     }
 
     public Queue<Visitor> getWaitingQueue() {
@@ -178,10 +223,6 @@ public class Ride implements RideInterface {
 
     // Part 4A: Ride history implementation
 
-    /**
-     * Adds a visitor to the ride history LinkedList
-     * @param visitor The visitor to add to history
-     */
     @Override
     public void addVisitorToHistory(Visitor visitor) {
         if (visitor != null) {
@@ -196,11 +237,6 @@ public class Ride implements RideInterface {
         }
     }
 
-    /**
-     * Checks if a visitor exists in the ride history
-     * @param visitor The visitor to check
-     * @return true if visitor is in history, false otherwise
-     */
     @Override
     public boolean checkVisitorFromHistory(Visitor visitor) {
         if (visitor != null) {
@@ -214,10 +250,6 @@ public class Ride implements RideInterface {
         }
     }
 
-    /**
-     * Returns the number of visitors in ride history
-     * @return Number of visitors in history
-     */
     @Override
     public int numberOfVisitors() {
         int count = rideHistory.size();
@@ -225,10 +257,6 @@ public class Ride implements RideInterface {
         return count;
     }
 
-    /**
-     * Prints all visitors in ride history using Iterator
-     * Required: Must use Iterator for full marks
-     */
     @Override
     public void printRideHistory() {
         if (rideHistory.isEmpty()) {
@@ -238,6 +266,7 @@ public class Ride implements RideInterface {
 
         System.out.println("\n📖 === Ride History for " + rideName + " ===");
         System.out.println("Total visitors in history: " + rideHistory.size());
+        System.out.println("Total cycles run: " + numOfCycles);
         System.out.println("----------------------------------------");
 
         // Using Iterator as required by assignment
@@ -258,10 +287,6 @@ public class Ride implements RideInterface {
 
     // Part 4B: Sorting implementation
 
-    /**
-     * Sorts the ride history using provided Comparator
-     * @param comparator The comparator to use for sorting
-     */
     public void sortRideHistory(Comparator<Visitor> comparator) {
         if (rideHistory.size() > 1) {
             Collections.sort(rideHistory, comparator);
@@ -271,9 +296,6 @@ public class Ride implements RideInterface {
         }
     }
 
-    /**
-     * Sorts the ride history by name (alphabetical order)
-     */
     public void sortRideHistoryByName() {
         if (rideHistory.size() > 1) {
             Collections.sort(rideHistory, new VisitorComparator("name"));
@@ -283,9 +305,6 @@ public class Ride implements RideInterface {
         }
     }
 
-    /**
-     * Sorts the ride history by age (ascending order)
-     */
     public void sortRideHistoryByAge() {
         if (rideHistory.size() > 1) {
             Collections.sort(rideHistory, new VisitorComparator("age"));
@@ -295,9 +314,6 @@ public class Ride implements RideInterface {
         }
     }
 
-    /**
-     * Sorts the ride history by membership level and age
-     */
     public void sortRideHistoryByMembershipAndAge() {
         if (rideHistory.size() > 1) {
             Collections.sort(rideHistory, new VisitorComparator("membership_age"));
@@ -307,10 +323,113 @@ public class Ride implements RideInterface {
         }
     }
 
-    // Part 5 method - To be implemented in Part 5
+    // Part 5: Run One Cycle Implementation
+
+    /**
+     * Runs the ride for one cycle
+     * - Checks if operator is assigned
+     * - Checks if there are waiting visitors
+     * - Removes visitors from queue based on maxRider
+     * - Adds visitors to ride history
+     * - Increases cycle count
+     */
     @Override
     public void runOneCycle() {
-        System.out.println("runOneCycle method - To be implemented in Part 5");
+        System.out.println("\n🎢 === Running " + rideName + " Cycle ===");
+
+        // Check if operator is assigned
+        if (operator == null) {
+            System.out.println("❌ Error: Cannot run ride - no operator assigned to " + rideName);
+            System.out.println("   Please assign an operator before running the ride.");
+            return;
+        }
+
+        // Check if there are waiting visitors in the queue
+        if (waitingQueue.isEmpty()) {
+            System.out.println("❌ Error: Cannot run ride - no visitors in the waiting queue for " + rideName);
+            System.out.println("   Please add visitors to the queue before running the ride.");
+            return;
+        }
+
+        // Calculate how many visitors can ride this cycle
+        int ridersThisCycle = Math.min(maxRider, waitingQueue.size());
+        System.out.println("🚀 Starting cycle with " + ridersThisCycle + " visitors (max capacity: " + maxRider + ")");
+        System.out.println("Operator: " + operator.getName());
+
+        // Process visitors for this cycle
+        List<Visitor> currentRiders = new ArrayList<>();
+
+        for (int i = 0; i < ridersThisCycle; i++) {
+            Visitor rider = waitingQueue.poll();
+            if (rider != null) {
+                currentRiders.add(rider);
+                // Add to ride history
+                rideHistory.add(rider);
+                System.out.println("   ✅ " + rider.getName() + " is riding (Ticket: " + rider.getTicketNumber() + ")");
+            }
+        }
+
+        // Increase cycle count
+        numOfCycles++;
+
+        // Print cycle summary
+        System.out.println("\n📊 Cycle Summary:");
+        System.out.println("   Riders this cycle: " + currentRiders.size());
+        System.out.println("   Remaining in queue: " + waitingQueue.size());
+        System.out.println("   Total cycles run: " + numOfCycles);
+        System.out.println("   Total visitors in history: " + rideHistory.size());
+
+        if (!currentRiders.isEmpty()) {
+            System.out.println("   Riders: " + currentRiders.stream()
+                    .map(Visitor::getName)
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("None"));
+        }
+
+        System.out.println("✅ Cycle completed successfully!\n");
+    }
+
+    /**
+     * Runs multiple cycles at once
+     * @param numberOfCycles Number of cycles to run
+     */
+    public void runMultipleCycles(int numberOfCycles) {
+        if (numberOfCycles <= 0) {
+            System.out.println("❌ Error: Number of cycles must be positive");
+            return;
+        }
+
+        System.out.println("\n🔄 === Running " + numberOfCycles + " Cycles for " + rideName + " ===");
+
+        for (int i = 1; i <= numberOfCycles; i++) {
+            System.out.println("\n--- Cycle " + i + " of " + numberOfCycles + " ---");
+            runOneCycle();
+
+            // Stop if queue becomes empty
+            if (waitingQueue.isEmpty()) {
+                System.out.println("⏹️ Stopping cycles - waiting queue is empty");
+                break;
+            }
+        }
+    }
+
+    /**
+     * Gets ride statistics
+     * @return String containing ride statistics
+     */
+    public String getRideStatistics() {
+        return String.format(
+                "Ride Statistics for %s:\n" +
+                        "  - Total cycles run: %d\n" +
+                        "  - Visitors in history: %d\n" +
+                        "  - Visitors waiting: %d\n" +
+                        "  - Max riders per cycle: %d\n" +
+                        "  - Operator: %s\n" +
+                        "  - Operational: %s",
+                rideName, numOfCycles, rideHistory.size(), waitingQueue.size(), maxRider,
+                (operator != null ? operator.getName() : "None"),
+                (isOperational ? "Yes" : "No")
+        );
     }
 
     // Part 6 & 7 methods - To be implemented
@@ -335,6 +454,8 @@ public class Ride implements RideInterface {
                 ", operator=" + operatorInfo +
                 ", capacity=" + capacity +
                 ", isOperational=" + isOperational +
+                ", maxRider=" + maxRider +
+                ", numOfCycles=" + numOfCycles +
                 ", queueSize=" + waitingQueue.size() +
                 ", historySize=" + rideHistory.size() +
                 '}';
