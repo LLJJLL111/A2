@@ -3,7 +3,7 @@ import java.io.*;
 
 /**
  * Ride class - Represents an amusement park ride
- * Part 5 Update: Implements ride cycle functionality
+ * Part 6 Update: Implements file export functionality for ride history
  */
 public class Ride implements RideInterface {
     // Basic ride attributes
@@ -36,7 +36,7 @@ public class Ride implements RideInterface {
         // Initialize collections
         this.waitingQueue = new LinkedList<>();
         this.rideHistory = new LinkedList<>();
-        this.maxRider = 2; // Default max riders per cycle
+        this.maxRider = 2;
         this.numOfCycles = 0;
     }
 
@@ -58,12 +58,12 @@ public class Ride implements RideInterface {
         // Initialize collections
         this.waitingQueue = new LinkedList<>();
         this.rideHistory = new LinkedList<>();
-        this.maxRider = 2; // Default max riders per cycle
+        this.maxRider = 2;
         this.numOfCycles = 0;
     }
 
     /**
-     * Constructor with maxRider parameter for Part 5
+     * Constructor with maxRider parameter
      * @param rideName The name of the ride
      * @param rideType The type of the ride
      * @param operator The employee operating the ride
@@ -133,15 +133,10 @@ public class Ride implements RideInterface {
         isOperational = operational;
     }
 
-    // Part 5: Getter and setter for maxRider and numOfCycles
     public int getMaxRider() {
         return maxRider;
     }
 
-    /**
-     * Sets the maximum number of riders per cycle
-     * @param maxRider Maximum riders (must be at least 1)
-     */
     public void setMaxRider(int maxRider) {
         if (maxRider >= 1) {
             this.maxRider = maxRider;
@@ -269,7 +264,6 @@ public class Ride implements RideInterface {
         System.out.println("Total cycles run: " + numOfCycles);
         System.out.println("----------------------------------------");
 
-        // Using Iterator as required by assignment
         Iterator<Visitor> iterator = rideHistory.iterator();
         int position = 1;
 
@@ -325,118 +319,226 @@ public class Ride implements RideInterface {
 
     // Part 5: Run One Cycle Implementation
 
-    /**
-     * Runs the ride for one cycle
-     * - Checks if operator is assigned
-     * - Checks if there are waiting visitors
-     * - Removes visitors from queue based on maxRider
-     * - Adds visitors to ride history
-     * - Increases cycle count
-     */
     @Override
     public void runOneCycle() {
         System.out.println("\n🎢 === Running " + rideName + " Cycle ===");
 
-        // Check if operator is assigned
         if (operator == null) {
             System.out.println("❌ Error: Cannot run ride - no operator assigned to " + rideName);
-            System.out.println("   Please assign an operator before running the ride.");
             return;
         }
 
-        // Check if there are waiting visitors in the queue
         if (waitingQueue.isEmpty()) {
             System.out.println("❌ Error: Cannot run ride - no visitors in the waiting queue for " + rideName);
-            System.out.println("   Please add visitors to the queue before running the ride.");
             return;
         }
 
-        // Calculate how many visitors can ride this cycle
         int ridersThisCycle = Math.min(maxRider, waitingQueue.size());
         System.out.println("🚀 Starting cycle with " + ridersThisCycle + " visitors (max capacity: " + maxRider + ")");
-        System.out.println("Operator: " + operator.getName());
-
-        // Process visitors for this cycle
-        List<Visitor> currentRiders = new ArrayList<>();
 
         for (int i = 0; i < ridersThisCycle; i++) {
             Visitor rider = waitingQueue.poll();
             if (rider != null) {
-                currentRiders.add(rider);
-                // Add to ride history
                 rideHistory.add(rider);
                 System.out.println("   ✅ " + rider.getName() + " is riding (Ticket: " + rider.getTicketNumber() + ")");
             }
         }
 
-        // Increase cycle count
         numOfCycles++;
 
-        // Print cycle summary
         System.out.println("\n📊 Cycle Summary:");
-        System.out.println("   Riders this cycle: " + currentRiders.size());
+        System.out.println("   Riders this cycle: " + ridersThisCycle);
         System.out.println("   Remaining in queue: " + waitingQueue.size());
         System.out.println("   Total cycles run: " + numOfCycles);
         System.out.println("   Total visitors in history: " + rideHistory.size());
-
-        if (!currentRiders.isEmpty()) {
-            System.out.println("   Riders: " + currentRiders.stream()
-                    .map(Visitor::getName)
-                    .reduce((a, b) -> a + ", " + b)
-                    .orElse("None"));
-        }
-
         System.out.println("✅ Cycle completed successfully!\n");
     }
 
+    // Part 6: File Export Implementation
+
     /**
-     * Runs multiple cycles at once
-     * @param numberOfCycles Number of cycles to run
+     * Exports ride history to a CSV file
+     * Writes details of all visitors in the ride history to a file
+     * Each visitor's details are written on their own line in CSV format
+     * @param filename The name of the file to write to
      */
-    public void runMultipleCycles(int numberOfCycles) {
-        if (numberOfCycles <= 0) {
-            System.out.println("❌ Error: Number of cycles must be positive");
+    public void exportRideHistory(String filename) {
+        System.out.println("\n💾 === Exporting Ride History to File ===");
+        System.out.println("File: " + filename);
+        System.out.println("Ride: " + rideName);
+
+        // Check if there is any history to export
+        if (rideHistory.isEmpty()) {
+            System.out.println("❌ Error: Cannot export - ride history is empty for " + rideName);
             return;
         }
 
-        System.out.println("\n🔄 === Running " + numberOfCycles + " Cycles for " + rideName + " ===");
+        PrintWriter writer = null;
+        try {
+            // Create PrintWriter with FileWriter for writing to file
+            writer = new PrintWriter(new FileWriter(filename));
 
-        for (int i = 1; i <= numberOfCycles; i++) {
-            System.out.println("\n--- Cycle " + i + " of " + numberOfCycles + " ---");
-            runOneCycle();
+            int exportedCount = 0;
 
-            // Stop if queue becomes empty
-            if (waitingQueue.isEmpty()) {
-                System.out.println("⏹️ Stopping cycles - waiting queue is empty");
-                break;
+            // Write each visitor to the file in CSV format
+            for (Visitor visitor : rideHistory) {
+                // Format: name,age,id,ticketNumber,membershipLevel,hasFastPass
+                String line = String.format("%s,%d,%s,%s,%s,%b",
+                        escapeCsv(visitor.getName()),
+                        visitor.getAge(),
+                        escapeCsv(visitor.getId()),
+                        escapeCsv(visitor.getTicketNumber()),
+                        escapeCsv(visitor.getMembershipLevel()),
+                        visitor.hasFastPass()
+                );
+
+                writer.println(line);
+                exportedCount++;
+            }
+
+            System.out.println("✅ Success: Exported " + exportedCount + " visitors to " + filename);
+            System.out.println("   File location: " + new File(filename).getAbsolutePath());
+
+        } catch (IOException e) {
+            System.out.println("❌ Error: Failed to export ride history to " + filename);
+            System.out.println("   Error details: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("❌ Error: Unexpected error during export");
+            System.out.println("   Error details: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            // Always close the writer in finally block
+            if (writer != null) {
+                writer.close();
+                System.out.println("   File writer closed successfully");
             }
         }
     }
 
     /**
-     * Gets ride statistics
-     * @return String containing ride statistics
+     * Helper method to escape CSV special characters
+     * @param field The field to escape
+     * @return Escaped field suitable for CSV
      */
-    public String getRideStatistics() {
-        return String.format(
-                "Ride Statistics for %s:\n" +
-                        "  - Total cycles run: %d\n" +
-                        "  - Visitors in history: %d\n" +
-                        "  - Visitors waiting: %d\n" +
-                        "  - Max riders per cycle: %d\n" +
-                        "  - Operator: %s\n" +
-                        "  - Operational: %s",
-                rideName, numOfCycles, rideHistory.size(), waitingQueue.size(), maxRider,
-                (operator != null ? operator.getName() : "None"),
-                (isOperational ? "Yes" : "No")
-        );
+    private String escapeCsv(String field) {
+        if (field == null) {
+            return "";
+        }
+
+        // If field contains commas, quotes, or newlines, wrap in quotes and escape internal quotes
+        if (field.contains(",") || field.contains("\"") || field.contains("\n")) {
+            return "\"" + field.replace("\"", "\"\"") + "\"";
+        }
+
+        return field;
     }
 
-    // Part 6 & 7 methods - To be implemented
-    public void exportRideHistory(String filename) {
-        System.out.println("exportRideHistory method - To be implemented in Part 6");
+    /**
+     * Exports ride history with additional header information
+     * @param filename The name of the file to write to
+     */
+    public void exportRideHistoryWithHeader(String filename) {
+        System.out.println("\n💾 === Exporting Ride History with Header ===");
+        System.out.println("File: " + filename);
+
+        if (rideHistory.isEmpty()) {
+            System.out.println("❌ Error: Cannot export - ride history is empty");
+            return;
+        }
+
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter(new FileWriter(filename));
+
+            // Write header information
+            writer.println("# Ride History Export");
+            writer.println("# Ride: " + rideName);
+            writer.println("# Ride Type: " + rideType);
+            writer.println("# Export Date: " + new Date());
+            writer.println("# Total Visitors: " + rideHistory.size());
+            writer.println("# Total Cycles: " + numOfCycles);
+            writer.println("# Columns: name,age,id,ticketNumber,membershipLevel,hasFastPass");
+            writer.println("# CSV Format");
+
+            int exportedCount = 0;
+
+            // Write data rows
+            for (Visitor visitor : rideHistory) {
+                String line = String.format("%s,%d,%s,%s,%s,%b",
+                        escapeCsv(visitor.getName()),
+                        visitor.getAge(),
+                        escapeCsv(visitor.getId()),
+                        escapeCsv(visitor.getTicketNumber()),
+                        escapeCsv(visitor.getMembershipLevel()),
+                        visitor.hasFastPass()
+                );
+
+                writer.println(line);
+                exportedCount++;
+            }
+
+            System.out.println("✅ Success: Exported " + exportedCount + " visitors with header to " + filename);
+
+        } catch (IOException e) {
+            System.out.println("❌ Error: Failed to export ride history with header");
+            System.out.println("   Error details: " + e.getMessage());
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
+        }
     }
 
+    /**
+     * Exports ride statistics to a separate file
+     * @param filename The name of the file to write statistics to
+     */
+    public void exportRideStatistics(String filename) {
+        System.out.println("\n📊 === Exporting Ride Statistics ===");
+
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter(new FileWriter(filename));
+
+            // Write comprehensive ride statistics
+            writer.println("Ride Statistics Report");
+            writer.println("======================");
+            writer.println("Ride Name: " + rideName);
+            writer.println("Ride Type: " + rideType);
+            writer.println("Operator: " + (operator != null ? operator.getName() : "None"));
+            writer.println("Capacity: " + capacity);
+            writer.println("Max Riders Per Cycle: " + maxRider);
+            writer.println("Operational: " + (isOperational ? "Yes" : "No"));
+            writer.println("Total Cycles Run: " + numOfCycles);
+            writer.println("Visitors in History: " + rideHistory.size());
+            writer.println("Visitors Waiting: " + waitingQueue.size());
+            writer.println("Export Date: " + new Date());
+            writer.println();
+
+            // Write visitor summary
+            writer.println("Visitor Summary:");
+            writer.println("----------------");
+            for (Visitor visitor : rideHistory) {
+                writer.println("- " + visitor.getName() +
+                        " (Age: " + visitor.getAge() +
+                        ", Membership: " + visitor.getMembershipLevel() +
+                        ", FastPass: " + (visitor.hasFastPass() ? "Yes" : "No") + ")");
+            }
+
+            System.out.println("✅ Success: Exported ride statistics to " + filename);
+
+        } catch (IOException e) {
+            System.out.println("❌ Error: Failed to export ride statistics");
+            System.out.println("   Error details: " + e.getMessage());
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
+        }
+    }
+
+    // Part 7 method - To be implemented in Part 7
     public void importRideHistory(String filename) {
         System.out.println("importRideHistory method - To be implemented in Part 7");
     }

@@ -2,7 +2,7 @@ import java.util.Comparator;
 
 /**
  * VisitorComparator - Implements Comparator interface for sorting visitors
- * Required for Part 4B sorting functionality used in Part 5 demonstration
+ * Required for Part 4B functionality
  */
 public class VisitorComparator implements Comparator<Visitor> {
     private String sortType;

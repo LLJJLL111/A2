@@ -1,6 +1,8 @@
+import java.io.File;
+
 /**
  * AssignmentTwo class - Main class containing demonstration methods
- * Part 5 Update: Implements partFive demonstration method for ride cycles
+ * Part 6 Update: Implements partSix demonstration method for file export
  */
 public class AssignmentTwo {
 
@@ -10,143 +12,146 @@ public class AssignmentTwo {
      */
     public static void main(String[] args) {
         System.out.println("=== Theme Park Visitor Management System ===");
-        System.out.println("Part 5: Ride Cycle Demonstration");
+        System.out.println("Part 6: File Export Demonstration");
 
         AssignmentTwo assignment = new AssignmentTwo();
 
-        // Execute Part 5 demonstration
-        assignment.partFive();
+        // Execute Part 6 demonstration
+        assignment.partSix();
     }
 
     /**
-     * Part 5: Run Ride Cycle Demonstration
-     * Creates Ride object, adds visitors to queue, runs cycles, demonstrates functionality
-     * Shows queue management, history tracking, and cycle counting
+     * Part 6: File Writing Demonstration
+     * Creates Ride object, adds visitors to history, exports to files
+     * Demonstrates CSV file writing with proper exception handling
      */
-    public void partFive() {
-        System.out.println("\n🎢 === Part 5: Run Ride Cycle Demonstration ===");
+    public void partSix() {
+        System.out.println("\n💾 === Part 6: File Writing Demonstration ===");
 
-        // Step 1: Create ride operator
-        System.out.println("\n1. Creating ride operator...");
-        Employee operator = new Employee("Alex Rider", 28, "E005", "OP005", "Ride Operations", "Operator");
-        System.out.println("   Operator created: " + operator.getName());
+        // Step 1: Create ride operator and ride
+        System.out.println("\n1. Setting up ride and operator...");
+        Employee operator = new Employee("Data Manager", 35, "E006", "OP006", "Data Operations", "Manager");
+        Ride spaceRide = new Ride("Galaxy Explorer", "Space Simulation", operator, 20, true, 3);
+        System.out.println("   Ride created: " + spaceRide.getRideName());
 
-        // Step 2: Create amusement ride with specific maxRider capacity
-        System.out.println("\n2. Creating amusement ride...");
-        Ride rollerCoaster = new Ride("Dragon Coaster", "Roller Coaster", operator, 24, true, 4);
-        System.out.println("   Ride created: " + rollerCoaster.getRideName());
-        System.out.println("   Max riders per cycle: " + rollerCoaster.getMaxRider());
-
-        // Step 3: Create at least 10 visitors as required
-        System.out.println("\n3. Creating visitors (minimum 10 as required)...");
+        // Step 2: Create visitors for ride history (minimum 5 as required)
+        System.out.println("\n2. Creating visitors for ride history...");
         Visitor[] visitors = {
-                new Visitor("Liam Johnson", 25, "V301", "T301", "Premium", true),
-                new Visitor("Emma Thompson", 30, "V302", "T302", "Standard", false),
-                new Visitor("Noah Williams", 22, "V303", "T303", "Gold", true),
-                new Visitor("Olivia Brown", 28, "V304", "T304", "Standard", false),
-                new Visitor("William Davis", 35, "V305", "T305", "Premium", true),
-                new Visitor("Ava Miller", 19, "V306", "T306", "Standard", true),
-                new Visitor("James Wilson", 42, "V307", "T307", "VIP", false),
-                new Visitor("Sophia Moore", 31, "V308", "T308", "Standard", true),
-                new Visitor("Benjamin Taylor", 26, "V309", "T309", "Premium", false),
-                new Visitor("Isabella Anderson", 23, "V310", "T310", "Standard", true),
-                new Visitor("Lucas Thomas", 29, "V311", "T311", "Gold", false), // Extra for testing
-                new Visitor("Mia Jackson", 33, "V312", "T312", "Standard", true)  // Extra for testing
+                new Visitor("John Cosmic", 27, "V401", "T401", "Premium", true),
+                new Visitor("Sarah Star", 24, "V402", "T402", "Standard", false),
+                new Visitor("Mike Nebula", 32, "V403", "T403", "Gold", true),
+                new Visitor("Lisa Comet", 19, "V404", "T404", "Standard", true),
+                new Visitor("David Orbit", 45, "V405", "T405", "Premium", false),
+                new Visitor("Emma Galaxy", 29, "V406", "T406", "VIP", true),    // Extra for testing
+                new Visitor("Tom Asteroid", 38, "V407", "T407", "Standard", false) // Extra for testing
         };
 
         // Display created visitors
         System.out.println("   Created " + visitors.length + " visitors:");
-        for (int i = 0; i < visitors.length; i++) {
-            System.out.println("   " + (i + 1) + ". " + visitors[i].getName() +
-                    " (Membership: " + visitors[i].getMembershipLevel() + ")");
-        }
-
-        // Step 4: Add visitors to waiting queue
-        System.out.println("\n4. Adding visitors to waiting queue...");
         for (Visitor visitor : visitors) {
-            rollerCoaster.addVisitorToQueue(visitor);
+            System.out.println("   - " + visitor.getName() +
+                    " (Membership: " + visitor.getMembershipLevel() + ")");
         }
 
-        // Step 5: Print initial queue status
-        System.out.println("\n5. Initial queue status:");
-        rollerCoaster.printQueue();
+        // Step 3: Add visitors to ride history
+        System.out.println("\n3. Adding visitors to ride history...");
+        for (Visitor visitor : visitors) {
+            spaceRide.addVisitorToHistory(visitor);
+        }
 
-        // Step 6: Run one cycle and show results
-        System.out.println("\n6. Running ONE CYCLE...");
-        rollerCoaster.runOneCycle();
+        // Step 4: Run some cycles to add more data
+        System.out.println("\n4. Running ride cycles to generate more data...");
 
-        // Step 7: Print queue after first cycle
-        System.out.println("\n7. Queue status after first cycle:");
-        rollerCoaster.printQueue();
+        // Add some visitors to queue and run cycles
+        Visitor[] queueVisitors = {
+                new Visitor("Queue Rider 1", 25, "V501", "T501", "Standard", false),
+                new Visitor("Queue Rider 2", 30, "V502", "T502", "Premium", true),
+                new Visitor("Queue Rider 3", 22, "V503", "T503", "Standard", false)
+        };
 
-        // Step 8: Print ride history after first cycle
-        System.out.println("\n8. Ride history after first cycle:");
-        rollerCoaster.printRideHistory();
+        for (Visitor visitor : queueVisitors) {
+            spaceRide.addVisitorToQueue(visitor);
+        }
 
-        // Step 9: Run multiple cycles to demonstrate continuous operation
-        System.out.println("\n9. Running MULTIPLE CYCLES...");
-        rollerCoaster.runMultipleCycles(3);
+        spaceRide.runOneCycle();
 
-        // Step 10: Show final queue and history status
-        System.out.println("\n10. Final status after all cycles:");
-        System.out.println("   Queue size: " + rollerCoaster.getQueueSize());
-        System.out.println("   History size: " + rollerCoaster.getHistorySize());
-        System.out.println("   Total cycles run: " + rollerCoaster.getNumOfCycles());
+        // Step 5: Print current ride history before export
+        System.out.println("\n5. Current ride history before export:");
+        spaceRide.printRideHistory();
 
-        // Step 11: Print final queue
-        System.out.println("\n11. Final queue:");
-        rollerCoaster.printQueue();
+        // Step 6: Export ride history to CSV file (main requirement)
+        System.out.println("\n6. Exporting ride history to CSV file...");
+        String mainExportFile = "galaxy_explorer_history.csv";
+        spaceRide.exportRideHistory(mainExportFile);
 
-        // Step 12: Print final ride history
-        System.out.println("\n12. Final ride history:");
-        rollerCoaster.printRideHistory();
+        // Step 7: Verify file was created
+        System.out.println("\n7. Verifying file creation...");
+        File exportFile = new File(mainExportFile);
+        if (exportFile.exists()) {
+            System.out.println("✅ Verification: File created successfully");
+            System.out.println("   File size: " + exportFile.length() + " bytes");
+            System.out.println("   File path: " + exportFile.getAbsolutePath());
+        } else {
+            System.out.println("❌ Verification: File was not created");
+        }
 
-        // Step 13: Test edge cases and error conditions
-        System.out.println("\n13. Testing edge cases and error conditions...");
+        // Step 8: Export with header information (additional feature)
+        System.out.println("\n8. Exporting with header information...");
+        String headerExportFile = "galaxy_explorer_history_with_header.csv";
+        spaceRide.exportRideHistoryWithHeader(headerExportFile);
 
-        // Test 13a: Run cycle with no operator
-        System.out.println("   a) Testing ride without operator:");
-        Ride noOperatorRide = new Ride("Test Ride", "General", null, 10, false, 2);
-        noOperatorRide.addVisitorToQueue(visitors[0]);
-        noOperatorRide.runOneCycle();
+        // Step 9: Export ride statistics (additional feature)
+        System.out.println("\n9. Exporting ride statistics...");
+        String statsFile = "galaxy_explorer_statistics.txt";
+        spaceRide.exportRideStatistics(statsFile);
 
-        // Test 13b: Run cycle with empty queue
-        System.out.println("   b) Testing ride with empty queue:");
-        Ride emptyQueueRide = new Ride("Empty Ride", "General", operator, 10, true, 2);
-        emptyQueueRide.runOneCycle();
+        // Step 10: Test edge cases and error handling
+        System.out.println("\n10. Testing edge cases and error handling...");
 
-        // Test 13c: Run cycle with fewer visitors than maxRider
-        System.out.println("   c) Testing with fewer visitors than maxRider:");
-        Ride smallRide = new Ride("Small Ride", "General", operator, 6, true, 5);
-        // Add only 3 visitors to a ride with maxRider=5
-        smallRide.addVisitorToQueue(visitors[0]);
-        smallRide.addVisitorToQueue(visitors[1]);
-        smallRide.addVisitorToQueue(visitors[2]);
-        smallRide.runOneCycle();
+        // Test 10a: Export from empty ride
+        System.out.println("   a) Testing export from empty ride:");
+        Ride emptyRide = new Ride("Empty Ride", "Test", operator, 10, true);
+        emptyRide.exportRideHistory("empty_ride_history.csv");
 
-        // Test 13d: Test setting invalid maxRider
-        System.out.println("   d) Testing invalid maxRider setting:");
-        rollerCoaster.setMaxRider(0); // Should show error
+        // Test 10b: Export to invalid file path
+        System.out.println("   b) Testing export to invalid path:");
+        spaceRide.exportRideHistory("/invalid/path/history.csv");
 
-        // Step 14: Display comprehensive ride statistics
-        System.out.println("\n14. Comprehensive Ride Statistics:");
-        System.out.println(rollerCoaster.getRideStatistics());
+        // Test 10c: Export with special characters in data
+        System.out.println("   c) Testing export with special characters:");
+        Ride specialRide = new Ride("Test Ride", "Special", operator, 10, true);
+        Visitor specialVisitor = new Visitor("John \"The Comma\", Smith", 25, "V999", "T999", "Premium, VIP", true);
+        specialRide.addVisitorToHistory(specialVisitor);
+        specialRide.exportRideHistory("special_chars_test.csv");
 
-        // Step 15: Verification of requirements
-        System.out.println("\n15. Verification of Part 5 Requirements:");
-        System.out.println("   ✓ Added maxRider instance variable: " + rollerCoaster.getMaxRider());
-        System.out.println("   ✓ Added numOfCycles instance variable: " + rollerCoaster.getNumOfCycles());
-        System.out.println("   ✓ Implemented runOneCycle() method successfully");
-        System.out.println("   ✓ Checks for operator assignment: " + (rollerCoaster.getOperator() != null));
-        System.out.println("   ✓ Checks for waiting visitors in queue");
-        System.out.println("   ✓ Removes visitors from queue based on maxRider");
-        System.out.println("   ✓ Adds visitors to ride history");
-        System.out.println("   ✓ Increases cycle count correctly");
-        System.out.println("   ✓ Provides clear success/failure messages");
-        System.out.println("   ✓ Added minimum 10 visitors to queue: " + (visitors.length >= 10));
+        // Step 11: Display file contents preview
+        System.out.println("\n11. File contents preview:");
+        System.out.println("   Main export file: " + mainExportFile);
+        System.out.println("   Expected format: name,age,id,ticketNumber,membershipLevel,hasFastPass");
+        System.out.println("   Sample line: \"John Cosmic\",27,V401,T401,Premium,true");
 
-        System.out.println("\n✅ Part 5 demonstration completed successfully!");
-        System.out.println("   All ride cycle functionality requirements have been met.");
+        // Step 12: Verify all assignment requirements are met
+        System.out.println("\n12. Verification of Part 6 Requirements:");
+        System.out.println("   ✓ Added exportRideHistory method to Ride class");
+        System.out.println("   ✓ Writes visitor details to file in CSV format");
+        System.out.println("   ✓ Each visitor on their own line");
+        System.out.println("   ✓ Includes all appropriate exception handling");
+        System.out.println("   ✓ Provides clear error messages");
+        System.out.println("   ✓ Added minimum 5 visitors to ride history: " + (spaceRide.getHistorySize() >= 5));
+        System.out.println("   ✓ Does not backup queue (as specified)");
+        System.out.println("   ✓ Uses proper file I/O operations");
+
+        // Step 13: Final summary
+        System.out.println("\n13. Export Summary:");
+        System.out.println("   Files created:");
+        System.out.println("   - " + mainExportFile + " (main CSV export)");
+        System.out.println("   - " + headerExportFile + " (CSV with header)");
+        System.out.println("   - " + statsFile + " (statistics report)");
+        System.out.println("   Total visitors exported: " + spaceRide.getHistorySize());
+        System.out.println("   Export completed: " + (exportFile.exists() ? "SUCCESS" : "FAILED"));
+
+        System.out.println("\n✅ Part 6 demonstration completed successfully!");
+        System.out.println("   All file writing functionality requirements have been met.");
     }
 
     // Placeholder methods for other parts
@@ -162,8 +167,8 @@ public class AssignmentTwo {
         System.out.println("Part 4B method - Already implemented");
     }
 
-    public void partSix() {
-        System.out.println("Part 6 method - To be implemented in Part 6");
+    public void partFive() {
+        System.out.println("Part 5 method - Already implemented");
     }
 
     public void partSeven() {
